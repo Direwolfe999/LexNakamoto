@@ -257,7 +257,7 @@ curl https://api.mainnet.hiro.so/v2/contracts/source/<DEPLOYER_ADDR>/lex-nakamot
 ## Tech Stack
 
 - **Clarity** (Nakamoto era) - Smart contract language for Stacks with Bitcoin-level finality
-- **Clarinet v3.14.1** - Development framework, simnet, and CLI
+- **Clarinet v3.14** - Development framework, simnet, and CLI
 - **Vitest v4** - Test runner with Clarinet SDK environment
 - **SIP-010** - Fungible token standard for sBTC interop
 - **Stacks Nakamoto** - Target network epoch with fast blocks
