@@ -10,3 +10,13 @@ coverage
 *.info
 costs-reports.json
 node_modules
+# env files (local secrets)
+.env
+.env.*
+**/.env
+**/.env.*
+
+# keep templates tracked
+!.env.example
+!**/.env.example
+!**/.env*.example

@@ -66,15 +66,15 @@ plan:
       contract-name: sip-010-ft-standard
       emulated-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
       path: contracts/sip-010-ft-standard.clar
-      clarity-version: 3
-    - transaction-type: emulated-contract-publish
-      contract-name: mock-sbtc
-      emulated-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
-      path: contracts/mock-sbtc.clar
-      clarity-version: 3
+      clarity-version: 2
     - transaction-type: emulated-contract-publish
       contract-name: lex-nakamoto-escrow
       emulated-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
       path: contracts/lex-nakamoto-escrow.clar
-      clarity-version: 3
-    epoch: '3.3'
+      clarity-version: 2
+    - transaction-type: emulated-contract-publish
+      contract-name: mock-sbtc
+      emulated-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
+      path: contracts/mock-sbtc.clar
+      clarity-version: 2
+    epoch: '3.0'

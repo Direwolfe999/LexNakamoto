@@ -28,6 +28,7 @@ const ONE_SBTC = 100_000_000;
 // Helpers
 // ---------------------------------------------------------------------------
 function mintSbtc(recipient: string, amount: number) {
+  authorizeRecipient(Cl.principal(recipient));
   return simnet.callPublicFn(
     "mock-sbtc", "mint",
     [Cl.uint(amount), Cl.principal(recipient)],
@@ -35,7 +36,28 @@ function mintSbtc(recipient: string, amount: number) {
   );
 }
 
+function authorizeRecipient(recipient: any) {
+  return simnet.callPublicFn(
+    "mock-sbtc", "authorize-recipient",
+    [recipient],
+    deployer
+  );
+}
+
+function syncTokenPermissions() {
+  // Required by mock-sbtc transfer guards:
+  // - buyer must be trusted for mint target
+  // - escrow contract must be trusted for lock transfer recipient
+  // - seller must be trusted for milestone/dispute payouts
+  authorizeRecipient(Cl.principal(buyer));
+  authorizeRecipient(Cl.principal(seller));
+  authorizeRecipient(Cl.contractPrincipal(deployer, escrowContract));
+}
+
 function createStandardEscrow(amount: number = ONE_SBTC, lockPeriod: number = 0) {
+  syncTokenPermissions();
+  // Whitelist mock-sbtc before every escrow creation (idempotent).
+  whitelistMockSbtc();
   return simnet.callPublicFn(
     escrowContract, "create-escrow",
     [
@@ -45,6 +67,14 @@ function createStandardEscrow(amount: number = ONE_SBTC, lockPeriod: number = 0)
       Cl.contractPrincipal(deployer, "mock-sbtc"),
     ],
     buyer
+  );
+}
+
+function whitelistMockSbtc() {
+  return simnet.callPublicFn(
+    escrowContract, "whitelist-token",
+    [Cl.contractPrincipal(deployer, "mock-sbtc")],
+    deployer
   );
 }
 
@@ -122,7 +152,7 @@ describe("Milestone Release", () => {
 
     const { result } = simnet.callPublicFn(
       escrowContract, "release-milestone",
-      [Cl.uint(0), Cl.uint(25)], buyer
+      [Cl.uint(0), Cl.uint(25), Cl.contractPrincipal(deployer, "mock-sbtc")], buyer
     );
     const expected25 = ONE_SBTC / 4; // 25,000,000 sats
     expect(result).toBeOk(Cl.uint(expected25));
@@ -146,12 +176,12 @@ describe("Milestone Release", () => {
 
     // First: release 25%.
     simnet.callPublicFn(escrowContract, "release-milestone",
-      [Cl.uint(0), Cl.uint(25)], buyer);
+      [Cl.uint(0), Cl.uint(25), Cl.contractPrincipal(deployer, "mock-sbtc")], buyer);
 
     // Second: release 50% total -> delta = 50% - 25% = 25%.
     const { result } = simnet.callPublicFn(
       escrowContract, "release-milestone",
-      [Cl.uint(0), Cl.uint(50)], buyer
+      [Cl.uint(0), Cl.uint(50), Cl.contractPrincipal(deployer, "mock-sbtc")], buyer
     );
     const delta = (ONE_SBTC / 2) - (ONE_SBTC / 4);
     expect(result).toBeOk(Cl.uint(delta));
@@ -168,7 +198,7 @@ describe("Milestone Release", () => {
     createStandardEscrow();
 
     simnet.callPublicFn(escrowContract, "release-milestone",
-      [Cl.uint(0), Cl.uint(100)], buyer);
+      [Cl.uint(0), Cl.uint(100), Cl.contractPrincipal(deployer, "mock-sbtc")], buyer);
 
     // Remaining balance should be 0.
     const remaining = simnet.callReadOnlyFn(
@@ -185,7 +215,7 @@ describe("Milestone Release", () => {
     // Trying to release again should fail (state is COMPLETED, not ACTIVE).
     const { result } = simnet.callPublicFn(
       escrowContract, "release-milestone",
-      [Cl.uint(0), Cl.uint(25)], buyer
+      [Cl.uint(0), Cl.uint(25), Cl.contractPrincipal(deployer, "mock-sbtc")], buyer
     );
     expect(result).toBeErr(Cl.uint(1005)); // ERR-ESCROW-NOT-ACTIVE
   });
@@ -196,7 +226,7 @@ describe("Milestone Release", () => {
 
     const { result } = simnet.callPublicFn(
       escrowContract, "release-milestone",
-      [Cl.uint(0), Cl.uint(30)], buyer
+      [Cl.uint(0), Cl.uint(30), Cl.contractPrincipal(deployer, "mock-sbtc")], buyer
     );
     expect(result).toBeErr(Cl.uint(1004)); // ERR-INVALID-MILESTONE
   });
@@ -213,7 +243,7 @@ describe("Security - Unauthorized Access", () => {
 
     const { result } = simnet.callPublicFn(
       escrowContract, "release-milestone",
-      [Cl.uint(0), Cl.uint(25)], outsider
+      [Cl.uint(0), Cl.uint(25), Cl.contractPrincipal(deployer, "mock-sbtc")], outsider
     );
     expect(result).toBeErr(Cl.uint(1000)); // ERR-NOT-AUTHORIZED
   });
@@ -224,7 +254,7 @@ describe("Security - Unauthorized Access", () => {
 
     const { result } = simnet.callPublicFn(
       escrowContract, "release-milestone",
-      [Cl.uint(0), Cl.uint(25)], seller
+      [Cl.uint(0), Cl.uint(25), Cl.contractPrincipal(deployer, "mock-sbtc")], seller
     );
     expect(result).toBeErr(Cl.uint(1000));
   });
@@ -247,7 +277,7 @@ describe("Security - Unauthorized Access", () => {
 
     const { result } = simnet.callPublicFn(
       escrowContract, "resolve-dispute",
-      [Cl.uint(0), Cl.uint(50)], outsider
+      [Cl.uint(0), Cl.uint(50), Cl.contractPrincipal(deployer, "mock-sbtc")], outsider
     );
     expect(result).toBeErr(Cl.uint(1000));
   });
@@ -259,7 +289,7 @@ describe("Security - Unauthorized Access", () => {
 
     const { result } = simnet.callPublicFn(
       escrowContract, "release-milestone",
-      [Cl.uint(0), Cl.uint(25)], buyer
+      [Cl.uint(0), Cl.uint(25), Cl.contractPrincipal(deployer, "mock-sbtc")], buyer
     );
     expect(result).toBeErr(Cl.uint(1005)); // ERR-ESCROW-NOT-ACTIVE
   });
@@ -282,7 +312,7 @@ describe("Dispute Resolution", () => {
     // Milestone release should now fail (escrow is frozen).
     const { result: releaseResult } = simnet.callPublicFn(
       escrowContract, "release-milestone",
-      [Cl.uint(0), Cl.uint(25)], buyer
+      [Cl.uint(0), Cl.uint(25), Cl.contractPrincipal(deployer, "mock-sbtc")], buyer
     );
     expect(releaseResult).toBeErr(Cl.uint(1005));
   });
@@ -304,7 +334,7 @@ describe("Dispute Resolution", () => {
 
     const { result } = simnet.callPublicFn(
       escrowContract, "resolve-dispute",
-      [Cl.uint(0), Cl.uint(100)], deployer
+      [Cl.uint(0), Cl.uint(100), Cl.contractPrincipal(deployer, "mock-sbtc")], deployer
     );
     expect(result).toBeOk(Cl.bool(true));
 
@@ -321,7 +351,7 @@ describe("Dispute Resolution", () => {
 
     const { result } = simnet.callPublicFn(
       escrowContract, "resolve-dispute",
-      [Cl.uint(0), Cl.uint(0)], deployer
+      [Cl.uint(0), Cl.uint(0), Cl.contractPrincipal(deployer, "mock-sbtc")], deployer
     );
     expect(result).toBeOk(Cl.bool(true));
 
@@ -348,7 +378,7 @@ describe("Read-Only Functions", () => {
     mintSbtc(buyer, ONE_SBTC);
     createStandardEscrow();
     simnet.callPublicFn(escrowContract, "release-milestone",
-      [Cl.uint(0), Cl.uint(25)], buyer);
+      [Cl.uint(0), Cl.uint(25), Cl.contractPrincipal(deployer, "mock-sbtc")], buyer);
 
     const { result } = simnet.callReadOnlyFn(
       escrowContract, "get-remaining-balance", [Cl.uint(0)], deployer
