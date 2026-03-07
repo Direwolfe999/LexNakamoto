@@ -53,8 +53,7 @@ The contract manages the state of every escrow agreement via a `Data Map`.
 ### Setup
 ```bash
 # Clone the repository
-[git clone [https://github.com/](https://github.com/)[YOUR_USERNAME]/lex-nakamoto.git](https://github.com/Direwolfe999/LexNakamoto.git)
-
+git clone https://github.com/Direwolfe999/LexNakamoto.git
 # Navigate to the folder
 cd lex-nakamoto
 
