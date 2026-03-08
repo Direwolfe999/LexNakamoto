@@ -1,0 +1,31 @@
+id: 0
+name: Testnet deployment
+network: testnet
+stacks-node: https://api.testnet.hiro.so
+bitcoin-node: http://blockstack:blockstacksystem@bitcoind.testnet.stacks.co:18332
+plan:
+  batches:
+  - id: 0
+    transactions:
+    - transaction-type: contract-publish
+      contract-name: sip-010-ft-standard
+      expected-sender: ST1CGS8GGS43K5NEWWPHTWG011ZS5AXQ5PMYQ5R9F
+      cost: 13150
+      path: contracts/sip-010-ft-standard.clar
+      anchor-block-only: true
+      clarity-version: 2
+    - transaction-type: contract-publish
+      contract-name: lex-nakamoto-escrow
+      expected-sender: ST1CGS8GGS43K5NEWWPHTWG011ZS5AXQ5PMYQ5R9F
+      cost: 220380
+      path: contracts/lex-nakamoto-escrow.clar
+      anchor-block-only: true
+      clarity-version: 2
+    - transaction-type: contract-publish
+      contract-name: mock-sbtc
+      expected-sender: ST1CGS8GGS43K5NEWWPHTWG011ZS5AXQ5PMYQ5R9F
+      cost: 33440
+      path: contracts/mock-sbtc.clar
+      anchor-block-only: true
+      clarity-version: 2
+    epoch: '3.0'
