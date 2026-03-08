@@ -7,7 +7,7 @@
 ## 🚀 Overview
 In a decentralized economy, trust is the biggest barrier to trade. **LexNakamoto** removes the need for "blind trust" between freelancers and clients. 
 
-By utilizing **Clarity 4**, this smart contract ensures that sBTC is only released when specific project milestones are met, or returned if the terms of the contract are violated.
+By utilizing **Clarity 3**, this smart contract ensures that sBTC is only released when specific project milestones are met, or returned if the terms of the contract are violated.
 
 ### Key Features
 * **sBTC Native:** Built specifically for the SIP-010 sBTC token standard.
@@ -28,7 +28,7 @@ The contract manages the state of every escrow agreement via a `Data Map`.
 - **Status 3:** Disputed (Funds frozen for arbitration)
 
 ### Built With
-* **Language:** Clarity 4.0
+* **Language:** Clarity 3.0
 * **Framework:** Clarinet
 * **Standard:** SIP-010 (sBTC)
 * **Testing:** Vitest (Stacks/Clarinet SDK)
