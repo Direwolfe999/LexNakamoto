@@ -12,6 +12,18 @@ export const metadata: Metadata = {
   title: "LexNakamoto — sBTC Escrow Protocol",
   description:
     "Milestone-based sBTC escrow with dispute resolution and settlement tracking on Stacks.",
+  icons: {
+    icon: [
+      { url: '/favicon/favicon-96x96.png', sizes: '96x96', type: 'image/png' },
+      { url: '/favicon/favicon.svg', type: 'image/svg+xml' },
+      { url: '/favicon/favicon.ico' }
+    ],
+    apple: '/favicon/apple-touch-icon.png',
+  },
+  openGraph: {
+    images: [{ url: '/favicon/apple-touch-icon.png' }]
+  },
+  manifest: '/favicon/site.webmanifest',
 };
 
 export default function RootLayout({
@@ -22,11 +34,6 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <head>
-        <link rel="icon" href="/favicon/favicon.ico" />
-        <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png" />
-        <link rel="icon" type="image/png" sizes="96x96" href="/favicon/favicon-96x96.png" />
-        <link rel="icon" type="image/svg+xml" href="/favicon/favicon.svg" />
-        <link rel="manifest" href="/favicon/site.webmanifest" />
       </head>
       <body
         className={`${inter.variable} min-h-screen bg-gray-950 font-sans text-white antialiased`}
