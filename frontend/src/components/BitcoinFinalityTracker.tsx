@@ -1,9 +1,8 @@
 // ============================================================================
-// BitcoinFinalityTracker — Nakamoto-era settlement status
+// BitcoinFinalityTracker — network settlement tracker
 // ============================================================================
-// Shows the current Stacks block height, Bitcoin burn block height,
-// tenure progress, and settlement status so users know when their
-// sBTC transaction is 100% settled on Bitcoin.
+// Shows current Stacks and burn-block data plus a simple settlement
+// estimate so users can monitor transaction progress in the dashboard.
 // ============================================================================
 
 "use client";
@@ -51,9 +50,10 @@ export default function BitcoinFinalityTracker() {
             return;
         }
 
+        const txId = latestTxId;
         let cancelled = false;
         async function syncStage() {
-            const progress = await getTransactionProgress(latestTxId);
+            const progress = await getTransactionProgress(txId);
             if (!cancelled) setStage(progress.stage);
         }
 
@@ -65,20 +65,18 @@ export default function BitcoinFinalityTracker() {
         };
     }, [latestTxId]);
 
-    // Nakamoto era: blocks within a tenure are fast (~5s), tenure changes
-    // happen when a new Bitcoin block is mined (~10min)
+    // Rough settlement estimate derived from current network block data.
     const tenureBlocks = blockInfo
         ? blockInfo.stacksBlockHeight - blockInfo.tenureHeight
         : 0;
-    // Settlement progress: after ~6 Bitcoin confirmations (~60min), the
-    // Stacks transaction is considered Bitcoin-final
+    // Treat six burn-block steps as a simple completion target for the UI.
     const estimatedSettlement = Math.min(tenureBlocks, 6);
     const settlementPct = Math.round((estimatedSettlement / 6) * 100);
 
     const getSettlementStatus = () => {
         if (!blockInfo) return { label: "Loading…", color: "text-white/40" };
         if (settlementPct >= 100)
-            return { label: "Bitcoin Final", color: "text-emerald-400" };
+            return { label: "Anchored", color: "text-emerald-400" };
         if (settlementPct >= 50)
             return { label: "Settling", color: "text-amber-400" };
         return { label: "Pending", color: "text-orange-400" };
@@ -97,7 +95,7 @@ export default function BitcoinFinalityTracker() {
                 <div className="flex items-center gap-2">
                     <span className="text-lg">₿</span>
                     <h3 className="text-sm font-semibold text-white">
-                        Bitcoin Finality
+                        Settlement Tracker
                     </h3>
                 </div>
                 <span
@@ -125,7 +123,7 @@ export default function BitcoinFinalityTracker() {
                     {/* Settlement Progress */}
                     <div>
                         <div className="mb-2 flex justify-between text-xs text-white/40">
-                            <span>Settlement Progress</span>
+                            <span>Settlement Estimate</span>
                             <span>{settlementPct}%</span>
                         </div>
                         <div className="h-2 w-full overflow-hidden rounded-full bg-white/5">
@@ -139,9 +137,9 @@ export default function BitcoinFinalityTracker() {
                     </div>
 
                     <div className="grid grid-cols-1 gap-2 rounded-lg border border-white/[0.06] bg-white/[0.02] p-3">
-                        <StageRow label="1. Mempool Broadcast" active={stageReached("mempool-broadcast")} />
-                        <StageRow label="2. Stacks Fast Block (Internal Finality)" active={stageReached("stacks-fast-block")} />
-                        <StageRow label="3. Bitcoin Anchor Block (L1 Settlement)" active={stageReached("bitcoin-anchor")} />
+                        <StageRow label="1. Broadcast" active={stageReached("mempool-broadcast")} />
+                        <StageRow label="2. Stacks Confirmation" active={stageReached("stacks-fast-block")} />
+                        <StageRow label="3. Bitcoin Anchor" active={stageReached("bitcoin-anchor")} />
                     </div>
 
                     {/* Block Stats */}
@@ -171,11 +169,12 @@ export default function BitcoinFinalityTracker() {
                     {/* Info */}
                     <div className="rounded-lg border border-white/[0.04] bg-white/[0.02] p-3">
                         <p className="text-xs leading-relaxed text-white/30">
-                            <strong className="text-white/50">Nakamoto Era:</strong>{" "}
-                            Stacks blocks are fast (~5s) within a tenure. Each new Bitcoin
-                            block (~{Math.round(BLOCK_TIME_SECONDS / 60)}min) starts a new
-                            tenure. After ~6 Bitcoin confirmations, your sBTC is fully
-                            settled on Bitcoin L1.
+                            <strong className="text-white/50">How to read this:</strong>{" "}
+                            This panel combines Stacks and burn-block data to show a
+                            simple settlement estimate. Each new Bitcoin block is roughly
+                            ~{Math.round(BLOCK_TIME_SECONDS / 60)} minutes, so six anchor
+                            steps gives a useful dashboard milestone rather than a legal
+                            finality guarantee.
                         </p>
                     </div>
 

@@ -6,8 +6,8 @@
 //
 // v2: getBlocksUntilExpiry, getPendingArbiter, isTokenWhitelisted,
 //     governance tx builders, getSbtcBalance, getBlockInfo, tx status polling.
-// v3: getEscrowStatus (int-to-ascii), getEscrowAge (tenure-height),
-//     isMilestoneOverdue, getBitcoinFinality (burn-block-height).
+// v3: getEscrowStatus (int-to-ascii), getEscrowAge,
+//     isMilestoneOverdue, and getBitcoinFinality helper calls.
 // ============================================================================
 
 import {
@@ -238,7 +238,7 @@ export async function getEscrowStatus(escrowId: number): Promise<string | null> 
   }
 }
 
-/** Get escrow age in tenure blocks via tenure-height (v3 SIP-034). */
+/** Get escrow age from the contract's stored creation-height helper. */
 export async function getEscrowAge(escrowId: number): Promise<number> {
   try {
     const result = await callReadOnly("get-escrow-age", [uintCV(escrowId)]);

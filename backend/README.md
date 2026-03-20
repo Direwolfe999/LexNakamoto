@@ -1,77 +1,41 @@
 # LexNakamoto Backend
 
-Express/TypeScript backend for:
-- sponsored transaction signing + broadcast
-- Nakamoto finality status tracking
-- lean event indexing cache
-- dispute case/evidence records
-- notification fanout hooks
+Optional Express/TypeScript backend for the LexNakamoto demo.
+
+## What it does
+
+- sponsors an allowlisted set of contract calls
+- checks transaction settlement status
+- caches watched transaction statuses
+- stores lightweight dispute records and evidence
+- exposes simple notification subscriber endpoints
+
+## Important limitation
+
+This backend is demo-grade today:
+
+- watched transaction cache is in memory
+- dispute records are in memory
+- some rate-limit state is in memory
+- sponsor flow requires a private key in server env
+
+That makes it suitable for a demo deployment, but not durable production infrastructure without persistent storage and operational hardening.
 
 ## Setup
 
-1. Copy env file:
+```bash
+npm install
+npm run dev
+```
 
-- from [backend/.env.example](.env.example) to `.env`
+Use `backend/.env.example` as the starting point for server env values.
 
-2. Install dependencies:
-
-- `npm install`
-
-3. Run dev server:
+## Scripts
 
 - `npm run dev`
+- `npm run build`
+- `npm start`
 
-## Endpoints
+## Hosting
 
-- `POST /api/sponsor`
-  - body: `{ txHex: string, principal?: string }`
-  - validates contract/function allowlist
-  - applies sponsor signature
-  - broadcasts to Stacks API
-
-- `GET /api/escrow/status/:txid`
-  - returns `pending | fast-path-secure | bitcoin-anchored-final | failed`
-  - includes `is_unanchored`, `burn_block_height`, and canonical flags
-
-- `POST /api/indexer/watch`
-  - body: `{ txid: string, tag?: string }`
-  - starts caching a tx status entry
-
-- `GET /api/indexer/tx/:txid`
-  - refreshes and returns one watched tx
-
-- `GET /api/indexer/watched`
-  - lists watched tx cache
-
-- `POST /api/disputes`
-  - body: `{ escrowId: number, openedBy: string, reason: string, txid?: string }`
-
-- `POST /api/disputes/:id/evidence`
-  - body: `{ kind: "url" | "note", content: string, submittedBy: string }`
-
-- `PATCH /api/disputes/:id/status`
-  - body: `{ status: "open" | "under-review" | "resolved", note?: string }`
-
-- `GET /api/disputes` and `GET /api/disputes/:id`
-
-- `POST /api/notifications/subscribers`
-  - body: `{ channel: "webhook" | "email" | "telegram", target: string }`
-
-- `POST /api/notifications/test`
-  - body: `{ event?: string, payload?: object }`
-
-- `GET /api/notifications/subscribers` and `GET /api/notifications/events`
-
-- `GET /health`
-
-## Security notes
-
-- sponsor key must be testnet-funded and isolated
-- in-memory rate limiter is enabled per IP and per principal (24h window)
-- allowlisted function sponsorship only
-- sponsor gas guardrails:
-  - block sponsorship when balance is below `SPONSOR_MIN_STX` (default 10)
-  - internal low-gas warning when below `SPONSOR_WARN_STX` (default 20)
-- policy guardrails:
-  - `SPONSOR_MAX_ESCROW_SATS`
-  - `SPONSOR_ALLOWED_TOKEN_CONTRACTS` (comma-separated)
+Render, Railway, or Fly.io are better fits than Vercel for this backend because the service holds private server secrets and keeps some live in-memory state.

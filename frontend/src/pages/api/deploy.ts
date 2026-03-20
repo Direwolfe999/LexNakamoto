@@ -58,6 +58,18 @@ function runClarinet(
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
 
+  const deployApiEnabled =
+    process.env.NEXT_PUBLIC_ENABLE_LOCAL_DEPLOY_API === "true" &&
+    process.env.ENABLE_LOCAL_CLARINET_DEPLOY === "true";
+
+  if (!deployApiEnabled) {
+    return res.status(403).json({
+      success: false,
+      error:
+        "This endpoint is a local developer helper only. Deploy contracts with Clarinet or CI and configure the frontend to point at the deployed address.",
+    });
+  }
+
   const projectRoot = process.env.PROJECT_ROOT ?? "../";
   const resolvedProjectRoot = path.resolve(process.cwd(), projectRoot);
   const network = req.body?.network === "mainnet" ? "mainnet" : "testnet";

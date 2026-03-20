@@ -37,7 +37,7 @@ function mintSbtc(recipient: string, amount: number) {
 function createEscrow(amount = ONE_SBTC) {
   return simnet.callPublicFn(
     escrowContract, "create-escrow",
-    [Cl.principal(seller), Cl.uint(amount), Cl.uint(0), tokenArg()],
+    [Cl.principal(seller), Cl.uint(amount), Cl.uint(0), tokenArg(), Cl.none()],
     buyer
   );
 }

@@ -20,10 +20,30 @@ export class FinalityMonitor {
     this.apiBase = process.env.STACKS_API_BASE ?? "https://api.testnet.hiro.so";
   }
 
+  
+  // Feature 7: Discord/Slack Webhook Integration
+  async notifyWebhook(txid, status) {
+    if (process.env.DISCORD_WEBHOOK_URL) {
+      try {
+        await fetch(process.env.DISCORD_WEBHOOK_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ content: `Escrow TX ${txid} reached finality state: ${status}` })
+        });
+      } catch (e) {
+        console.error('Webhook failed', e);
+      }
+    }
+  }
+
   async getTxStatus(txid: string): Promise<TxStatusResponse> {
     const res = await fetch(`${this.apiBase}/extended/v1/tx/${txid}`);
     if (!res.ok) {
-      return {
+      if (status !== 'pending' && status !== 'failed') {
+      this.notifyWebhook(txid, status);
+    }
+
+    return {
         txid,
         tx_status: "pending",
         status: "pending",

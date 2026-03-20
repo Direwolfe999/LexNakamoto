@@ -1,41 +1,49 @@
 # LexNakamoto Frontend
 
-Frontend for LexNakamoto escrow protocol.
+Next.js frontend for the LexNakamoto escrow demo.
 
-## Clean Setup (No Local Devnet)
+## What it includes
 
-This frontend is configured to use **Stacks testnet API** by default.
+- wallet connection and discovery
+- escrow dashboard and creation flow
+- settlement tracker and transaction feed
+- sponsor-policy checks
+- local developer helper routes that proxy to the optional backend
 
-### 1) Install and run
+## Local setup
 
 ```bash
 npm install
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
+Use `frontend/.env.example` as the starting point for local env values.
 
-### 2) Environment
+## Hosted deployment
 
-Configured in [frontend/.env.local](frontend/.env.local):
+Vercel is a good fit for this frontend.
 
-- `NEXT_PUBLIC_NETWORK=testnet`
-- `NEXT_PUBLIC_STACKS_API_URL=https://api.testnet.hiro.so`
-- `NEXT_PUBLIC_ESCROW_CONTRACT_ADDRESS=<your deployed testnet address>`
-- `NEXT_PUBLIC_ESCROW_CONTRACT_NAME=lex-nakamoto-escrow`
+Set these env vars in Vercel:
 
-### 3) Deploy contract from API route
+- `NEXT_PUBLIC_NETWORK`
+- `NEXT_PUBLIC_STACKS_API_URL`
+- `NEXT_PUBLIC_ESCROW_CONTRACT_ADDRESS`
+- `NEXT_PUBLIC_ESCROW_CONTRACT_NAME`
+- `NEXT_PUBLIC_SBTC_CONTRACT`
+- `BACKEND_API_URL` if you are also hosting the optional backend
 
-The deploy endpoint now uses:
+Keep these disabled in hosted deployments:
 
-- `clarinet deployments apply --testnet` (default)
-- `clarinet deployments apply --mainnet` (if request body sets `network: "mainnet"`)
+- `NEXT_PUBLIC_ENABLE_LOCAL_DEPLOY_API=false`
+- `ENABLE_LOCAL_CLARINET_DEPLOY=false`
 
-Before deploying, set a real mnemonic in [settings/Testnet.toml](../settings/Testnet.toml).
+## Local-only deploy helper
 
-If mnemonic is still placeholder, deploy API returns a clear error.
+`src/pages/api/deploy.ts` shells out to `clarinet deployments apply`. That is only meant for local developer use.
 
-## Notes
+Enable it only when running locally with both of these flags set to `true`:
 
-- Local `clarinet devnet start` is not required for frontend usage.
-- After deployment, update `NEXT_PUBLIC_ESCROW_CONTRACT_ADDRESS` and restart `npm run dev`.
+- `NEXT_PUBLIC_ENABLE_LOCAL_DEPLOY_API`
+- `ENABLE_LOCAL_CLARINET_DEPLOY`
+
+For submission and hosted demos, deploy the contract with Clarinet or CI instead of from the browser.

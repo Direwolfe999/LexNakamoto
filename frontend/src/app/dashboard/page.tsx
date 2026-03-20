@@ -28,7 +28,8 @@ import {
 } from "@/lib/stacks-api";
 
 export default function DashboardPage() {
-    const { address, isWalletConnected, sbtcBalance, refreshBalance } = useWallet();
+    const { address, isWalletConnected, sbtcBalance, refreshBalance } =
+        useWallet();
     const [escrows, setEscrows] = useState<EscrowData[]>([]);
     const [loading, setLoading] = useState(true);
     const [showCreate, setShowCreate] = useState(false);
@@ -37,8 +38,10 @@ export default function DashboardPage() {
     const [deploying, setDeploying] = useState(false);
     const [bootstrapping, setBootstrapping] = useState(false);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
-    const [sponsorPolicy, setSponsorPolicy] = useState<SponsorPolicyPayload | null>(null);
+    const [sponsorPolicy, setSponsorPolicy] =
+        useState<SponsorPolicyPayload | null>(null);
     const [policyLoading, setPolicyLoading] = useState(true);
+    const deployHelperEnabled = process.env.NEXT_PUBLIC_ENABLE_LOCAL_DEPLOY_API === "true";
 
     // Check contract existence on load
     const checkContract = useCallback(async () => {
@@ -73,7 +76,8 @@ export default function DashboardPage() {
             const q = address ? `?principal=${encodeURIComponent(address)}` : "";
             const r = await fetch(`/api/sponsor-policy${q}`);
             const payload = await r.json().catch(() => ({}));
-            if (!r.ok) throw new Error(payload?.error ?? "Failed to load sponsor policy");
+            if (!r.ok)
+                throw new Error(payload?.error ?? "Failed to load sponsor policy");
             setSponsorPolicy(payload);
         } catch {
             setSponsorPolicy(null);
@@ -83,6 +87,16 @@ export default function DashboardPage() {
     }, [address]);
 
     const deployContracts = useCallback(async () => {
+        if (!deployHelperEnabled) {
+            showToast({
+                type: "info",
+                title: "Local deploy helper disabled",
+                message:
+                    "Use Clarinet or CI to deploy the contract, then point this app at the deployed address.",
+            });
+            return;
+        }
+
         if (contractExists) {
             showToast({
                 type: "info",
@@ -104,7 +118,10 @@ export default function DashboardPage() {
         try {
             const controller = new AbortController();
             const timeout = setTimeout(() => controller.abort(), 60_000);
-            const res = await fetch("/api/deploy", { method: "POST", signal: controller.signal });
+            const res = await fetch("/api/deploy", {
+                method: "POST",
+                signal: controller.signal,
+            });
             clearTimeout(timeout);
             const payload = await res.json().catch(() => ({}));
 
@@ -119,15 +136,18 @@ export default function DashboardPage() {
 
             showToast({
                 type: "success",
-                title: payload?.alreadyDeployed ? "Already deployed" : "Deployment complete",
+                title: payload?.alreadyDeployed
+                    ? "Already deployed"
+                    : "Deployment complete",
                 message: payload?.message ?? "Contracts are available on testnet.",
             });
         } catch (err) {
-            const msg = err instanceof Error && err.name === "AbortError"
-                ? "Deployment check timed out. Please retry."
-                : err instanceof Error
-                    ? err.message
-                    : "Deployment failed";
+            const msg =
+                err instanceof Error && err.name === "AbortError"
+                    ? "Deployment check timed out. Please retry."
+                    : err instanceof Error
+                        ? err.message
+                        : "Deployment failed";
             setErrorMessage(msg);
             showToast({
                 type: "error",
@@ -138,11 +158,15 @@ export default function DashboardPage() {
             dismissToast(toastId);
             setDeploying(false);
         }
-    }, [checkContract, contractExists, fetchEscrows]);
+    }, [checkContract, contractExists, deployHelperEnabled, fetchEscrows]);
 
     const bootstrapTestnet = useCallback(async () => {
         if (!address) {
-            showToast({ type: "error", title: "Wallet required", message: "Connect wallet first." });
+            showToast({
+                type: "error",
+                title: "Wallet required",
+                message: "Connect wallet first.",
+            });
             return;
         }
 
@@ -166,10 +190,19 @@ export default function DashboardPage() {
         try {
             const escrowPrincipal = `${CONTRACT_ADDRESS}.${ESCROW_CONTRACT_NAME}`;
 
-            await request("stx_callContract", buildAuthorizeRecipientTxOptions(address));
-            await request("stx_callContract", buildAuthorizeRecipientTxOptions(escrowPrincipal));
+            await request(
+                "stx_callContract",
+                buildAuthorizeRecipientTxOptions(address),
+            );
+            await request(
+                "stx_callContract",
+                buildAuthorizeRecipientTxOptions(escrowPrincipal),
+            );
             await request("stx_callContract", buildWhitelistTokenTxOptions());
-            await request("stx_callContract", buildMintMockSbtcTxOptions(address, 100_000_000n)); // 1.0 sBTC
+            await request(
+                "stx_callContract",
+                buildMintMockSbtcTxOptions(address, 100_000_000n),
+            ); // 1.0 sBTC
 
             await refreshBalance();
             await fetchEscrows();
@@ -214,18 +247,29 @@ export default function DashboardPage() {
             {/* Contract existence check and deploy prompt */}
             {!contractExists && (
                 <GlassCard className="p-6 text-center">
-                    <h3 className="text-xl font-bold text-orange-400 mb-2">Contract Not Found</h3>
+                    <h3 className="text-xl font-bold text-orange-400 mb-2">
+                        Contract Not Found
+                    </h3>
                     <p className="text-white/70 mb-4">
-                        The escrow contract is not deployed on this network.<br />
-                        Click below to deploy contracts to testnet.
+                        The escrow contract is not deployed on this network.
+                        <br />
+                        {deployHelperEnabled
+                            ? "Use the local developer helper below to deploy it to testnet."
+                            : "Deploy it with Clarinet or CI, then update the frontend contract address for this environment."}
                     </p>
-                    <button
-                        className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-orange-500/25 transition-shadow hover:shadow-orange-500/40"
-                        disabled={deploying}
-                        onClick={deployContracts}
-                    >
-                        {deploying ? "Deploying..." : "Deploy to Testnet"}
-                    </button>
+                    {deployHelperEnabled ? (
+                        <button
+                            className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-orange-500/25 transition-shadow hover:shadow-orange-500/40"
+                            disabled={deploying}
+                            onClick={deployContracts}
+                        >
+                            {deploying ? "Deploying..." : "Deploy to Testnet"}
+                        </button>
+                    ) : (
+                        <p className="text-xs text-white/35">
+                            Browser-triggered deployment is disabled in hosted builds.
+                        </p>
+                    )}
                 </GlassCard>
             )}
 
@@ -243,13 +287,19 @@ export default function DashboardPage() {
                             >
                                 Retry
                             </button>
-                            <button
-                                onClick={deployContracts}
-                                disabled={deploying}
-                                className="rounded-lg bg-orange-500/90 px-3 py-1.5 text-xs font-medium text-white hover:bg-orange-500 disabled:opacity-60"
-                            >
-                                {deploying ? "Deploying..." : contractExists ? "Deployed ✓" : "Deploy"}
-                            </button>
+                            {deployHelperEnabled && (
+                                <button
+                                    onClick={deployContracts}
+                                    disabled={deploying}
+                                    className="rounded-lg bg-orange-500/90 px-3 py-1.5 text-xs font-medium text-white hover:bg-orange-500 disabled:opacity-60"
+                                >
+                                    {deploying
+                                        ? "Deploying..."
+                                        : contractExists
+                                            ? "Deployed ✓"
+                                            : "Deploy"}
+                                </button>
+                            )}
                         </div>
                     </div>
                 </GlassCard>
@@ -259,8 +309,9 @@ export default function DashboardPage() {
                 <GlassCard className="border border-blue-500/30 p-4">
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                         <p className="text-sm text-blue-200">
-                            Smart setup tip: your wallet has 0 mock sBTC. Deploy is done, but you still need token bootstrap
-                            (authorize recipients + mint + whitelist token) before creating escrow.
+                            Smart setup tip: your wallet has 0 mock sBTC. Deploy is done, but
+                            you still need token bootstrap (authorize recipients + mint +
+                            whitelist token) before creating escrow.
                         </p>
                         <button
                             onClick={bootstrapTestnet}
@@ -287,16 +338,22 @@ export default function DashboardPage() {
                 </div>
 
                 <div className="flex gap-2">
-                    <button
-                        onClick={deployContracts}
-                        disabled={deploying}
-                        className={`inline-flex items-center rounded-xl border px-4 py-2 text-xs font-medium disabled:opacity-60 ${contractExists
-                            ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500/20"
-                            : "border-orange-500/30 bg-orange-500/10 text-orange-300 hover:bg-orange-500/20"
-                            }`}
-                    >
-                        {deploying ? "Deploying..." : contractExists ? "Deployed ✓" : "Deploy/Repair"}
-                    </button>
+                    {deployHelperEnabled && (
+                        <button
+                            onClick={deployContracts}
+                            disabled={deploying}
+                            className={`inline-flex items-center rounded-xl border px-4 py-2 text-xs font-medium disabled:opacity-60 ${contractExists
+                                    ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500/20"
+                                    : "border-orange-500/30 bg-orange-500/10 text-orange-300 hover:bg-orange-500/20"
+                                }`}
+                        >
+                            {deploying
+                                ? "Deploying..."
+                                : contractExists
+                                    ? "Deployed ✓"
+                                    : "Deploy/Repair"}
+                        </button>
+                    )}
                     {isWalletConnected && contractExists && (
                         <motion.button
                             whileHover={{ scale: 1.05 }}
@@ -310,8 +367,18 @@ export default function DashboardPage() {
               transition-shadow hover:shadow-orange-500/40
             "
                         >
-                            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                            <svg
+                                className="h-4 w-4"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                            >
+                                <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M12 4v16m8-8H4"
+                                />
                             </svg>
                             New Escrow
                         </motion.button>

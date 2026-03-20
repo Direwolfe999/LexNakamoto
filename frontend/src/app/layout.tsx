@@ -11,7 +11,7 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: "LexNakamoto — sBTC Escrow Protocol",
   description:
-    "Milestone-based sBTC escrow with dispute resolution for the Stacks Nakamoto era.",
+    "Milestone-based sBTC escrow with dispute resolution and settlement tracking on Stacks.",
 };
 
 export default function RootLayout({

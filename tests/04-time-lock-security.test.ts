@@ -10,8 +10,8 @@ import { Cl } from "@stacks/transactions";
 
 const accounts = simnet.getAccounts();
 const deployer = accounts.get("deployer")!;
-const buyer    = accounts.get("wallet_1")!;
-const seller   = accounts.get("wallet_2")!;
+const buyer = accounts.get("wallet_1")!;
+const seller = accounts.get("wallet_2")!;
 
 const escrowContract = "lex-nakamoto-escrow";
 const ONE_SBTC = 100_000_000;
@@ -36,7 +36,7 @@ function mintSbtc(recipient: string, amount: number) {
 function createEscrow(amount = ONE_SBTC, lockPeriod = 0) {
   return simnet.callPublicFn(
     escrowContract, "create-escrow",
-    [Cl.principal(seller), Cl.uint(amount), Cl.uint(lockPeriod), tokenArg()],
+    [Cl.principal(seller), Cl.uint(amount), Cl.uint(lockPeriod), tokenArg(), Cl.none()],
     buyer
   );
 }
@@ -184,8 +184,7 @@ describe("Time-Lock & Expiry", () => {
     createEscrow();
 
     // Advance past 30-day threshold (4320 tenure blocks).
-    simnet.mineEmptyBlocks(4321);
-
+    simnet.mineEmptyBlocks(518401);
     const { result } = simnet.callPublicFn(
       escrowContract, "clawback-overdue",
       [Cl.uint(0), tokenArg()],
@@ -204,7 +203,7 @@ describe("Time-Lock & Expiry", () => {
       escrowContract, "get-escrow-status", [Cl.uint(0)], deployer
     );
     expect(status.result).toBeOk(Cl.stringAscii("Escrow #0: Refunded"));
-  });
+  }, 20000);
 
   it("seller cannot clawback (ERR-NOT-AUTHORIZED u1000)", () => {
     whitelistToken();

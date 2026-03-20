@@ -65,6 +65,7 @@ function createStandardEscrow(amount: number = ONE_SBTC, lockPeriod: number = 0)
       Cl.uint(amount),
       Cl.uint(lockPeriod),
       Cl.contractPrincipal(deployer, "mock-sbtc"),
+      Cl.none()
     ],
     buyer
   );
@@ -113,7 +114,7 @@ describe("Escrow Creation", () => {
     const { result } = simnet.callPublicFn(
       escrowContract, "create-escrow",
       [Cl.principal(seller), Cl.uint(0), Cl.uint(0),
-       Cl.contractPrincipal(deployer, "mock-sbtc")],
+       Cl.contractPrincipal(deployer, "mock-sbtc"), Cl.none()],
       buyer
     );
     expect(result).toBeErr(Cl.uint(1003));
@@ -124,7 +125,7 @@ describe("Escrow Creation", () => {
     const { result } = simnet.callPublicFn(
       escrowContract, "create-escrow",
       [Cl.principal(buyer), Cl.uint(ONE_SBTC), Cl.uint(0),
-       Cl.contractPrincipal(deployer, "mock-sbtc")],
+       Cl.contractPrincipal(deployer, "mock-sbtc"), Cl.none()],
       buyer
     );
     expect(result).toBeErr(Cl.uint(1013));
