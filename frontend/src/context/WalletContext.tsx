@@ -16,7 +16,7 @@ import React, {
     useRef,
     type ReactNode,
 } from "react";
-import { showConnect, disconnect as stacksDisconnect, isConnected, getLocalStorage } from "@stacks/connect";
+import { connect, disconnect as stacksDisconnect, isConnected, getLocalStorage } from "@stacks/connect";
 import { getSbtcBalance } from "@/lib/stacks-api";
 import { satsToSbtc, type WalletProviderId } from "@/lib/constants";
 
@@ -25,7 +25,7 @@ import { satsToSbtc, type WalletProviderId } from "@/lib/constants";
 function detectWalletProvider(): WalletProviderId {
     if (typeof window === "undefined") return "unknown";
     const win = window as unknown as Record<string, unknown>;
-    
+
     // Explicit LeatherProvider check (New Leather API)
     if (win.LeatherProvider) return "leather";
 
@@ -151,28 +151,16 @@ export function WalletProvider({ children }: { children: ReactNode }) {
 
     const connectWallet = useCallback(async () => {
         try {
-            showConnect({
-                appDetails: {
-                    name: "LexNakamoto Escrow",
-                    icon: window.location.origin + "/favicon/favicon.ico",
-                },
-                onFinish: () => {
-                    // Update state from local storage once auth completes
-                    const stored = getLocalStorage();
-                    const stxAddrs = stored?.addresses?.stx;
-                    if (stxAddrs && stxAddrs.length > 0) {
-                        setAddress(stxAddrs[0].address);
-                        setWalletProvider(detectWalletProvider());
-                    }
-                },
-                onCancel: () => {
-                    console.log("Wallet connection cancelled by user");
-                },
-            });
+            const response = await connect();
+            const stxAddr = response?.addresses?.find((a) => a.symbol === "STX");
+            if (stxAddr) {
+                setAddress(stxAddr.address);
+                setWalletProvider(detectWalletProvider());
+            }
         } catch (err) {
             console.error("Wallet connection failed:", err);
         }
-    }, []);
+    }, [detectWalletProvider]);
 
     const disconnectWallet = useCallback(() => {
         stacksDisconnect();
