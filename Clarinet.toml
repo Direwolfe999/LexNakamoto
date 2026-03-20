@@ -1,0 +1,30 @@
+[project]
+name = "lex-nakamoto"
+description = ""
+authors = []
+telemetry = false
+cache_dir = "./.cache"
+
+[repl.analysis]
+passes = ["check_checker"]
+trusted_sender = true
+trusted_caller = true
+callee_filter = true
+
+[contracts.sip-010-ft-standard]
+path = "contracts/sip-010-ft-standard.clar"
+clarity_version = 2
+epoch = 3.0
+
+[contracts.mock-sbtc]
+path = "contracts/mock-sbtc.clar"
+clarity_version = 2
+epoch = 3.0
+
+[contracts.lex-nakamoto-escrow]
+path = "contracts/lex-nakamoto-escrow.clar"
+clarity_version = 2
+epoch = 3.0
+
+[repl]
+with_proxy = false
