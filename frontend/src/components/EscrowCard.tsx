@@ -23,7 +23,7 @@ import {
     type EscrowData,
     type PostConditionPreview,
 } from "@/lib/stacks-api";
-import { showToast, updateToast } from "./ToastNotification";
+import { showToast } from "./ToastNotification";
 
 interface EscrowCardProps {
     escrow: EscrowData;

@@ -16,7 +16,7 @@ import React, {
     useRef,
     type ReactNode,
 } from "react";
-import { connect, disconnect as stacksDisconnect, isConnected, getLocalStorage } from "@stacks/connect";
+import { connect, showConnect, disconnect as stacksDisconnect, isConnected, getLocalStorage } from "@stacks/connect";
 import { getSbtcBalance } from "@/lib/stacks-api";
 import { satsToSbtc, type WalletProviderId } from "@/lib/constants";
 
@@ -151,16 +151,38 @@ export function WalletProvider({ children }: { children: ReactNode }) {
 
     const connectWallet = useCallback(async () => {
         try {
-            const response = await connect();
-            const stxAddr = response?.addresses?.find((a) => a.symbol === "STX");
-            if (stxAddr) {
-                setAddress(stxAddr.address);
-                setWalletProvider(detectWalletProvider());
+            // Attempt to use legacy appDetails for branded popup showing site logo and name
+            if (typeof showConnect === "function") {
+                showConnect({
+                    appDetails: {
+                        name: "LexNakamoto Escrow",
+                        icon: window.location.origin + "/favicon/apple-touch-icon.png",
+                    },
+                    onFinish: () => {
+                        const stored = getLocalStorage();
+                        const stxAddrs = stored?.addresses?.stx;
+                        if (stxAddrs && stxAddrs.length > 0) {
+                            setAddress(stxAddrs[0].address);
+                            setWalletProvider(detectWalletProvider());
+                        }
+                    },
+                    onCancel: () => {
+                        console.log("User canceled wallet connection.");
+                    }
+                });
+            } else {
+                // Fallback to strict SIP-030 format if showConnect export fails on client
+                const response = await connect();
+                const stxAddr = response?.addresses?.find((a) => a.symbol === "STX");
+                if (stxAddr) {
+                    setAddress(stxAddr.address);
+                    setWalletProvider(detectWalletProvider());
+                }
             }
         } catch (err) {
             console.error("Wallet connection failed:", err);
         }
-    }, [detectWalletProvider]);
+    }, []);
 
     const disconnectWallet = useCallback(() => {
         stacksDisconnect();
