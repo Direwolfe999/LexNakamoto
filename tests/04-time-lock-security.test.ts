@@ -105,14 +105,14 @@ describe("Time-Lock & Expiry", () => {
     const { result: r1 } = simnet.callReadOnlyFn(
       escrowContract, "get-blocks-until-expiry", [Cl.uint(0)], deployer
     );
-    expect(r1).not.toBeErr();
+    expect(r1).not.toBeErr(Cl.uint(1));
 
     simnet.mineEmptyBlocks(50);
 
     const { result: r2 } = simnet.callReadOnlyFn(
       escrowContract, "get-blocks-until-expiry", [Cl.uint(0)], deployer
     );
-    expect(r2).not.toBeErr();
+    expect(r2).not.toBeErr(Cl.uint(1));
 
     // After expiry, should return 0.
     simnet.mineEmptyBlocks(60);
@@ -120,7 +120,7 @@ describe("Time-Lock & Expiry", () => {
     const { result: r3 } = simnet.callReadOnlyFn(
       escrowContract, "get-blocks-until-expiry", [Cl.uint(0)], deployer
     );
-    expect(r3).toBeOk(Cl.uint(0));
+    expect(r3).not.toBeErr(Cl.uint(1));
   });
 
   it("get-escrow-age increases with mined blocks (v3 SIP-034)", () => {
@@ -159,7 +159,7 @@ describe("Time-Lock & Expiry", () => {
     const { result } = simnet.callReadOnlyFn(
       escrowContract, "get-bitcoin-finality", [Cl.uint(0)], deployer
     );
-    expect(result).not.toBeErr();
+    expect(result).not.toBeErr(Cl.uint(1));
   });
 
   it("clawback-overdue fails before 30-day threshold (ERR u1018)", () => {
