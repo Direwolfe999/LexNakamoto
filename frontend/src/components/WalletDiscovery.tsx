@@ -163,7 +163,10 @@ function WalletNotFound() {
                         exit={{ opacity: 0, y: -10, scale: 0.95 }}
                         className="absolute right-0 top-full z-50 mt-2 w-72 overflow-hidden rounded-xl border border-white/[0.08] bg-gray-900/95 p-4 shadow-2xl backdrop-blur-xl"
                     >
-                        <p className="mb-3 text-sm font-semibold text-white">Install a Stacks Wallet</p>
+                        <div className="mb-3 flex items-center justify-between">
+                            <p className="text-sm font-semibold text-white">Install a Stacks Wallet</p>
+                            <button onClick={() => window.location.reload()} className="text-xs text-amber-500 hover:text-amber-400">Refresh</button>
+                        </div>
                         <div className="space-y-2">
                             {wallets.map((w) => (
                                 <a

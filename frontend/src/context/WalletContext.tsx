@@ -16,7 +16,7 @@ import React, {
     useRef,
     type ReactNode,
 } from "react";
-import { connect, disconnect as stacksDisconnect, isConnected, getLocalStorage } from "@stacks/connect";
+import { showConnect, disconnect as stacksDisconnect, isConnected, getLocalStorage } from "@stacks/connect";
 import { getSbtcBalance } from "@/lib/stacks-api";
 import { satsToSbtc, type WalletProviderId } from "@/lib/constants";
 
@@ -25,6 +25,10 @@ import { satsToSbtc, type WalletProviderId } from "@/lib/constants";
 function detectWalletProvider(): WalletProviderId {
     if (typeof window === "undefined") return "unknown";
     const win = window as unknown as Record<string, unknown>;
+    
+    // Explicit LeatherProvider check (New Leather API)
+    if (win.LeatherProvider) return "leather";
+
     const provider = win.StacksProvider as
         | Record<string, unknown>
         | undefined;
@@ -40,7 +44,8 @@ function detectWalletProvider(): WalletProviderId {
 
 function isWalletInstalled(): boolean {
     if (typeof window === "undefined") return false;
-    return !!(window as unknown as Record<string, unknown>).StacksProvider;
+    const win = window as unknown as Record<string, unknown>;
+    return !!win.StacksProvider || !!win.LeatherProvider;
 }
 
 // ── Context Shape ───────────────────────────────────────────────────────────
@@ -80,10 +85,27 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     const [sbtcBalanceRaw, setSbtcBalanceRaw] = useState<bigint>(0n);
     const balanceInterval = useRef<ReturnType<typeof setInterval> | null>(null);
 
-    // Detect wallet on mount
+    // Detect wallet on mount with polling (extensions take time to inject)
     useEffect(() => {
-        setWalletInstalled(isWalletInstalled());
-        setWalletProvider(detectWalletProvider());
+        const checkWallet = () => {
+            if (isWalletInstalled()) {
+                setWalletInstalled(true);
+                setWalletProvider(detectWalletProvider());
+                return true;
+            }
+            return false;
+        };
+
+        if (!checkWallet()) {
+            let attempts = 0;
+            const timer = setInterval(() => {
+                attempts++;
+                if (checkWallet() || attempts > 10) {
+                    clearInterval(timer);
+                }
+            }, 500); // Poll every 500ms up to 5 seconds
+            return () => clearInterval(timer);
+        }
     }, []);
 
     // Restore session on mount
@@ -129,12 +151,24 @@ export function WalletProvider({ children }: { children: ReactNode }) {
 
     const connectWallet = useCallback(async () => {
         try {
-            const response = await connect();
-            const stxAddr = response?.addresses?.find((a) => a.symbol === "STX");
-            if (stxAddr) {
-                setAddress(stxAddr.address);
-                setWalletProvider(detectWalletProvider());
-            }
+            showConnect({
+                appDetails: {
+                    name: "LexNakamoto Escrow",
+                    icon: window.location.origin + "/favicon/favicon.ico",
+                },
+                onFinish: () => {
+                    // Update state from local storage once auth completes
+                    const stored = getLocalStorage();
+                    const stxAddrs = stored?.addresses?.stx;
+                    if (stxAddrs && stxAddrs.length > 0) {
+                        setAddress(stxAddrs[0].address);
+                        setWalletProvider(detectWalletProvider());
+                    }
+                },
+                onCancel: () => {
+                    console.log("Wallet connection cancelled by user");
+                },
+            });
         } catch (err) {
             console.error("Wallet connection failed:", err);
         }
