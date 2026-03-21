@@ -108,8 +108,8 @@ export default function MilestoneTracker({
                                     animate={{ scale: 1 }}
                                     transition={{ delay: m.pct * 0.01, type: "spring" }}
                                     className={`mt-6 h-3 w-3 rounded-full border-2 transition-all ${reached
-                                            ? `${m.color} border-white/40 shadow-lg`
-                                            : "border-white/15 bg-white/5"
+                                        ? `${m.color} border-white/40 shadow-lg`
+                                        : "border-white/15 bg-white/5"
                                         }`}
                                 />
                                 <span
@@ -140,8 +140,8 @@ export default function MilestoneTracker({
                     initial={{ opacity: 0, height: 0 }}
                     animate={{ opacity: 1, height: "auto" }}
                     className={`rounded-lg border p-3 ${blocksRemaining === 0
-                            ? "border-rose-500/20 bg-rose-500/5"
-                            : "border-orange-500/20 bg-orange-500/5"
+                        ? "border-rose-500/20 bg-rose-500/5"
+                        : "border-orange-500/20 bg-orange-500/5"
                         }`}
                 >
                     <div className="flex items-center gap-2">

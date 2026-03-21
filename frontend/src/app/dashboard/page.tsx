@@ -343,8 +343,8 @@ export default function DashboardPage() {
                             onClick={deployContracts}
                             disabled={deploying}
                             className={`inline-flex items-center rounded-xl border px-4 py-2 text-xs font-medium disabled:opacity-60 ${contractExists
-                                    ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500/20"
-                                    : "border-orange-500/30 bg-orange-500/10 text-orange-300 hover:bg-orange-500/20"
+                                ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500/20"
+                                : "border-orange-500/30 bg-orange-500/10 text-orange-300 hover:bg-orange-500/20"
                                 }`}
                         >
                             {deploying
