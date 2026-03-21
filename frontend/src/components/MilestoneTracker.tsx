@@ -75,7 +75,7 @@ export default function MilestoneTracker({
     return (
         <div className="space-y-4">
             {/* Header */}
-            <div className="flex items-center justify-between text-sm">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between text-sm gap-1">
                 <span className="text-white/60">Milestone Progress</span>
                 <span className="font-mono text-white/90">
                     {satsToSbtc(releasedAmount)} / {satsToSbtc(totalAmount)} sBTC
@@ -125,7 +125,7 @@ export default function MilestoneTracker({
             </div>
 
             {/* Bottom stats */}
-            <div className="flex items-center justify-between pt-4 text-xs">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between pt-4 text-xs gap-1">
                 <span className="text-white/40">
                     Released: <span className="text-white/60">{pct}%</span>
                 </span>

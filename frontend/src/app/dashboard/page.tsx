@@ -337,7 +337,7 @@ export default function DashboardPage() {
                     </p>
                 </div>
 
-                <div className="flex gap-2">
+                <div className="flex flex-wrap gap-2 sm:mb-0 mb-2">
                     {deployHelperEnabled && (
                         <button
                             onClick={deployContracts}
@@ -398,7 +398,7 @@ export default function DashboardPage() {
                 <div className="space-y-6 xl:col-span-2">
                     {/* Filter tabs */}
                     {isWalletConnected && contractExists && (
-                        <div className="flex gap-2">
+                        <div className="flex flex-wrap gap-2">
                             {(["all", "buyer", "seller"] as const).map((f) => (
                                 <button
                                     key={f}

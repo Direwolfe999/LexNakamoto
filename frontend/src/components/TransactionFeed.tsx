@@ -81,18 +81,18 @@ export default function TransactionFeed() {
                   transition-colors hover:bg-white/[0.06]
                 "
                             >
-                                <div className="flex items-center gap-3">
+                                <div className="flex items-center gap-3 min-w-0">
                                     <EventIcon type={event.eventType} />
-                                    <div>
-                                        <p className="text-sm font-medium text-white/80">
+                                    <div className="min-w-0">
+                                        <p className="text-sm font-medium text-white/80 truncate">
                                             {event.eventType.replace(/_/g, " ")}
                                         </p>
-                                        <p className="font-mono text-xs text-white/30">
+                                        <p className="font-mono text-xs text-white/30 truncate">
                                             {event.txId.slice(0, 10)}…{event.txId.slice(-6)}
                                         </p>
                                     </div>
                                 </div>
-                                <div className="text-right">
+                                <div className="text-right whitespace-nowrap ml-2">
                                     <p className="text-xs text-white/40">
                                         Block #{event.blockHeight}
                                     </p>

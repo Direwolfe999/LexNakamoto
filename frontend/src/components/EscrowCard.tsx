@@ -145,9 +145,9 @@ export default function EscrowCard({ escrow, onAction }: EscrowCardProps) {
     return (
         <GlassCard hover className="p-6">
             {/* Header */}
-            <div className="flex items-start justify-between">
+            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
                 <div>
-                    <div className="flex items-center gap-3">
+                    <div className="flex flex-wrap items-center gap-3">
                         <h3 className="text-lg font-semibold text-white">
                             Escrow #{escrow.escrowId}
                         </h3>
@@ -157,7 +157,7 @@ export default function EscrowCard({ escrow, onAction }: EscrowCardProps) {
                         {isBuyer ? "You are the buyer" : isSeller ? "You are the seller" : "Observer"}
                     </p>
                 </div>
-                <div className="text-right">
+                <div className="text-left sm:text-right">
                     <p className="text-2xl font-bold text-white">
                         {satsToSbtc(escrow.totalAmount)}
                     </p>
@@ -285,9 +285,9 @@ export default function EscrowCard({ escrow, onAction }: EscrowCardProps) {
 
 function DetailRow({ label, value }: { label: string; value: string }) {
     return (
-        <div className="flex justify-between">
+        <div className="flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4">
             <span className="text-white/40">{label}</span>
-            <span className="font-mono text-white/70">{value}</span>
+            <span className="font-mono text-white/70 break-all sm:text-right">{value}</span>
         </div>
     );
 }
