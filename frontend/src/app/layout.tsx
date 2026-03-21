@@ -32,11 +32,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark">
+    <html lang="en" suppressHydrationWarning>
       <head>
       </head>
       <body
-        className={`${inter.variable} min-h-screen bg-gray-950 font-sans text-white antialiased`}
+        className={`${inter.variable} min-h-screen bg-slate-50 dark:bg-gray-950 font-sans text-gray-900 dark:text-white antialiased`}
       >
         <ClientProviders>
           {/* Background gradient orbs */}

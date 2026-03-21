@@ -14,7 +14,9 @@
     "@stacks/stacking": "^7.3.1",
     "@stacks/transactions": "^7.3.1",
     "framer-motion": "^12.35.0",
+    "lucide-react": "^0.577.0",
     "next": "16.1.6",
+    "next-themes": "^0.4.6",
     "react": "19.2.3",
     "react-dom": "19.2.3"
   },

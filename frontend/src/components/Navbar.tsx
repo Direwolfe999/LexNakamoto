@@ -7,6 +7,7 @@
 import { motion } from "framer-motion";
 import WalletDiscovery from "./WalletDiscovery";
 import Link from "next/link";
+import { ThemeToggle } from "./ThemeToggle";
 
 export default function Navbar() {
     return (
@@ -16,8 +17,8 @@ export default function Navbar() {
             transition={{ duration: 0.5 }}
             className="
         fixed left-0 right-0 top-0 z-30
-        border-b border-white/[0.06]
-        bg-gray-950/80 backdrop-blur-xl
+        border-b border-gray-200 dark:border-white/[0.06]
+        bg-white/80 dark:bg-gray-950/80 backdrop-blur-xl
       "
         >
             <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
@@ -27,8 +28,8 @@ export default function Navbar() {
                         LN
                     </div>
                     <div>
-                        <h1 className="text-lg font-bold text-white">LexNakamoto</h1>
-                        <p className="text-[10px] font-medium uppercase tracking-widest text-white/30">
+                        <h1 className="text-lg font-bold text-gray-900 dark:text-white">LexNakamoto</h1>
+                        <p className="text-[10px] font-medium uppercase tracking-widest text-gray-500 dark:text-white/30">
                             sBTC Escrow Protocol
                         </p>
                     </div>
@@ -38,6 +39,7 @@ export default function Navbar() {
                 <div className="hidden items-center gap-8 md:flex">
                     <NavLink href="/dashboard">Dashboard</NavLink>
                     <NavLink href="/dashboard" label="Escrows">Escrows</NavLink>
+                    <NavLink href="/how-it-works">How It Works</NavLink>
                     <NavLink
                         href="https://github.com/Direwolfe999/LexNakamoto"
                         external
@@ -46,8 +48,12 @@ export default function Navbar() {
                     </NavLink>
                 </div>
 
-                {/* Wallet — now using v2 WalletDiscovery */}
-                <WalletDiscovery />
+                {/* Actions */}
+                <div className="flex items-center gap-4">
+                    <ThemeToggle />
+                    {/* Wallet — now using v2 WalletDiscovery */}
+                    <WalletDiscovery />
+                </div>
             </div>
         </motion.nav>
     );

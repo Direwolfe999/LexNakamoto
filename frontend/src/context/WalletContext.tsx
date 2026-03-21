@@ -159,11 +159,12 @@ export function WalletProvider({ children }: { children: ReactNode }) {
                 setAddress(stxAddr.address);
                 setWalletProvider(detectWalletProvider());
             }
-        } catch (err: any) {
-            if (err?.message?.includes("User rejected") || err?.code === -32000 || err?.code === -31001) {
+        } catch (err: unknown) {
+            const e = err as { message?: string; code?: number };
+            if (e?.message?.includes("User rejected") || e?.code === -32000 || e?.code === -31001) {
                 console.log("Wallet connection canceled by user.");
             } else {
-                console.error("Wallet connection failed:", err);
+                console.error("Wallet connection failed:", e);
             }
         }
     }, []);
