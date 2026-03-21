@@ -33,7 +33,7 @@ export default function DashboardPage() {
     const [escrows, setEscrows] = useState<EscrowData[]>([]);
     const [loading, setLoading] = useState(true);
     const [showCreate, setShowCreate] = useState(false);
-    const [filter, setFilter] = useState<"all" | "buyer" | "seller">("all");
+    const [filter, setFilter] = useState<"all" | "buyer" | "seller" | "arbiter">("all");
     const [contractExists, setContractExists] = useState(true);
     const [deploying, setDeploying] = useState(false);
     const [bootstrapping, setBootstrapping] = useState(false);
@@ -239,6 +239,7 @@ export default function DashboardPage() {
         if (!address || filter === "all") return true;
         if (filter === "buyer") return e.buyer === address;
         if (filter === "seller") return e.seller === address;
+        if (filter === "arbiter") return e.arbiter === address;
         return true;
     });
 
@@ -337,14 +338,14 @@ export default function DashboardPage() {
                     </p>
                 </div>
 
-                <div className="flex gap-2">
+                <div className="flex flex-wrap gap-2 sm:mb-0 mb-2">
                     {deployHelperEnabled && (
                         <button
                             onClick={deployContracts}
                             disabled={deploying}
                             className={`inline-flex items-center rounded-xl border px-4 py-2 text-xs font-medium disabled:opacity-60 ${contractExists
-                                    ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500/20"
-                                    : "border-orange-500/30 bg-orange-500/10 text-orange-300 hover:bg-orange-500/20"
+                                ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500/20"
+                                : "border-orange-500/30 bg-orange-500/10 text-orange-300 hover:bg-orange-500/20"
                                 }`}
                         >
                             {deploying
@@ -398,8 +399,8 @@ export default function DashboardPage() {
                 <div className="space-y-6 xl:col-span-2">
                     {/* Filter tabs */}
                     {isWalletConnected && contractExists && (
-                        <div className="flex gap-2">
-                            {(["all", "buyer", "seller"] as const).map((f) => (
+                        <div className="flex flex-wrap gap-2">
+                            {(["all", "buyer", "seller", "arbiter"] as const).map((f) => (
                                 <button
                                     key={f}
                                     onClick={() => setFilter(f)}

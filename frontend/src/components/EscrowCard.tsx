@@ -16,6 +16,7 @@ import { satsToSbtc, VALID_MILESTONES } from "@/lib/constants";
 import {
     buildReleaseMilestoneTxOptions,
     buildInitiateDisputeTxOptions,
+    buildResolveDisputeTxOptions,
     buildReclaimExpiredTxOptions,
     buildPostConditionPreview,
     isMilestoneOverdue,
@@ -57,6 +58,7 @@ export default function EscrowCard({ escrow, onAction }: EscrowCardProps) {
 
     const isBuyer = address === escrow.buyer;
     const isSeller = address === escrow.seller;
+    const isArbiter = address === escrow.arbiter;
     const isActive = escrow.state === 1;
     const remaining = escrow.totalAmount - escrow.releasedAmount;
 
@@ -113,6 +115,30 @@ export default function EscrowCard({ escrow, onAction }: EscrowCardProps) {
             } catch (err) {
                 console.error("Dispute failed:", err);
                 showToast({ type: "error", title: "Dispute Failed", message: String(err) });
+            } finally {
+                setLoading(false);
+            }
+        });
+    };
+
+    const handleResolveDispute = async (pct: number) => {
+        const preview = buildPostConditionPreview(`Resolve Dispute: ${pct}% to Seller`, {
+            sender: "Arbiter",
+            receiver: "Escrow contract",
+            amount: 0n,
+            mode: "allow", // Arbiter interactions might allow transfers depending on contract internals
+        });
+
+        withSafetyPreview(preview, async () => {
+            setLoading(true);
+            try {
+                const opts = buildResolveDisputeTxOptions(escrow.escrowId, pct);
+                await request("stx_callContract", opts);
+                showToast({ type: "success", title: "Dispute Resolved", message: `Assigned ${pct}% to seller.` });
+                onAction?.();
+            } catch (err) {
+                console.error("Resolve failed:", err);
+                showToast({ type: "error", title: "Resolution Failed", message: String(err) });
             } finally {
                 setLoading(false);
             }
@@ -266,6 +292,27 @@ export default function EscrowCard({ escrow, onAction }: EscrowCardProps) {
                             onClick={handleDispute}
                         />
                     )}
+                </div>
+            )}
+
+            {/* Arbiter Actions */}
+            {address && isArbiter && escrow.state === 2 && (
+                <div className="mt-5 flex flex-wrap gap-2 rounded-xl border border-amber-500/20 bg-amber-500/5 p-4">
+                    <div className="w-full mb-2 flex items-center gap-2 text-sm text-amber-500">
+                        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3" />
+                        </svg>
+                        <span className="font-semibold">Arbiter Resolution controls: Target % to Seller</span>
+                    </div>
+                    {([0, ...VALID_MILESTONES] as number[]).map((pct) => (
+                        <ActionButton
+                            key={`arb-${pct}`}
+                            label={`${pct}% to Seller`}
+                            variant={pct === 0 ? "danger" : pct === 100 ? "primary" : "warning"}
+                            loading={loading}
+                            onClick={() => handleResolveDispute(pct)}
+                        />
+                    ))}
                 </div>
             )}
 
