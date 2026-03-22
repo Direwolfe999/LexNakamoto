@@ -697,7 +697,7 @@
     )
 
     ;; In a real implementation we would enforce multisig or a two-step approval here.
-    ;; For this hackathon scope, we allow the caller (buyer or seller) who mutually agreed off-chain
+    ;; For this initial scope, we allow the caller (buyer or seller) who mutually agreed off-chain
     ;; bounds to trigger an exact split. To completely finish this we'd add an signatures check.
 
     (if (> to-buyer u0)

@@ -2,7 +2,7 @@
 # ==============================================================================
 # Feature 12: Competition-Ready Developer Experience Script
 # Unifies Next.js UI, TSX Node Indexer, and File Watching to make 
-# Hackathon judging completely frictionless.
+# project evaluation completely frictionless.
 # ==============================================================================
 
 echo "[dev:all] Starting full B2B Protocol Environment (Nakamoto + sBTC)"

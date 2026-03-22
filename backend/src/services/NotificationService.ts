@@ -42,7 +42,7 @@ export class NotificationService {
     this.eventLog.unshift(record);
     this.eventLog.splice(50);
 
-    // Lean hackathon implementation: log fanout targets for observability.
+    // Lean implementation: log fanout targets for observability.
     for (const sub of this.subscribers.values()) {
       console.log(`[notify:${sub.channel}] ${sub.target} <= ${event}`);
     }
