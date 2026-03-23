@@ -1,0 +1,22 @@
+**/settings/Mainnet.toml
+**/settings/Testnet.toml
+.cache/**
+history.txt
+
+logs
+*.log
+npm-debug.log*
+coverage
+*.info
+costs-reports.json
+node_modules
+# env files (local secrets)
+.env
+.env.*
+**/.env
+**/.env.*
+
+# keep templates tracked
+!.env.example
+!**/.env.example
+!**/.env*.example
