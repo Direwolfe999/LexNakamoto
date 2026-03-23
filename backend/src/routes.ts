@@ -4,6 +4,7 @@ import { FinalityMonitor } from "./services/FinalityMonitor.js";
 import { IndexerService } from "./services/IndexerService.js";
 import { NotificationService } from "./services/NotificationService.js";
 import { SponsorService } from "./services/SponsorService.js";
+import { sponsorRateLimiter } from "./middleware/rateLimiter.js";
 
 const router = Router();
 const sponsorService = new SponsorService();
@@ -16,7 +17,7 @@ router.get("/health", (_req: Request, res: Response) => {
   res.json({ ok: true, service: "lex-nakamoto-backend" });
 });
 
-router.post("/api/sponsor", async (req: Request, res: Response) => {
+router.post("/api/sponsor", sponsorRateLimiter, async (req: Request, res: Response) => {
   try {
     const txHex = String(req.body?.txHex ?? "");
     const principal = req.body?.principal ? String(req.body.principal) : undefined;
