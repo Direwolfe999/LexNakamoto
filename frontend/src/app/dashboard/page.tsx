@@ -332,7 +332,7 @@ export default function DashboardPage() {
                 className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
             >
                 <div>
-                    <h2 className="text-3xl font-bold text-white">Dashboard</h2>
+                    <h2 data-tour="tour-welcome" className="text-3xl font-bold text-white">Dashboard</h2>
                     <p className="mt-1 text-sm text-white/40">
                         Manage your milestone-based sBTC escrows
                     </p>
@@ -396,7 +396,7 @@ export default function DashboardPage() {
             {/* Main Content Grid */}
             <div className="grid grid-cols-1 gap-8 xl:grid-cols-3">
                 {/* Escrow List — 2/3 width */}
-                <div className="space-y-6 xl:col-span-2">
+                <div data-tour="tour-escrow-list" className="space-y-6 xl:col-span-2">
                     {/* Filter tabs */}
                     {isWalletConnected && contractExists && (
                         <div className="flex flex-wrap gap-2">

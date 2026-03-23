@@ -150,7 +150,7 @@ export default function CreateEscrowModal({
                             Lock sBTC in a milestone-based escrow contract
                         </p>
 
-                        <form onSubmit={handleSubmit} className="mt-6 space-y-5">
+                        <form data-tour="tour-escrow-form" onSubmit={handleSubmit} className="mt-6 space-y-5">
                             {/* Seller */}
                             <div>
                                 <label className="text-sm font-medium text-white/60">

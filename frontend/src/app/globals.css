@@ -18,6 +18,13 @@
   --font-sans: var(--font-inter);
 }
 
+/* Disable text selection and copying globally */
+body {
+  -webkit-user-select: none; /* Safari */
+  -ms-user-select: none; /* IE 10 and IE 11 */
+  user-select: none; /* Standard syntax */
+}
+
 * {
   scrollbar-width: thin;
   scrollbar-color: rgba(255, 255, 255, 0.1) transparent;

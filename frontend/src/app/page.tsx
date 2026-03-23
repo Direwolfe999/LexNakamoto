@@ -1,72 +1,120 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
+import Link from 'next/link';
+import { motion } from 'framer-motion';
 
-export default function LexNakamotoDashboard() {
-  const [sbtcPrice] = useState<number | null>(65420.50); // Mock Redstone/Stacks API
-  const [escrowAmt] = useState<number>(2.5);
-  const [finalityState, setFinalityState] = useState<'pending' | 'fast-path-secure' | 'bitcoin-anchored-final'>('pending');
-
-  // Feature 6: WebSocket Sync Simulator
-  useEffect(() => {
-    const timer1 = setTimeout(() => setFinalityState('fast-path-secure'), 5000); // 5s Nakamoto Fast-Path
-    const timer2 = setTimeout(() => setFinalityState('bitcoin-anchored-final'), 15000); // Simulated L1
-    return () => { clearTimeout(timer1); clearTimeout(timer2) };
-  }, []);
-
+export default function LandingPage() {
   return (
-    <main className="min-h-screen bg-gray-950 text-white p-10 font-sans">
-      <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-orange-400 to-yellow-600 mb-2">LexNakamoto B2B Escrow</h1>
-      <p className="text-gray-400 mb-10 text-sm">Powered by Nakamoto & sBTC</p>
+    <div className="min-h-[calc(100vh-100px)] flex flex-col items-center justify-center text-center px-4">
+      {/* Hero Badge */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="mb-8 inline-flex items-center gap-2 rounded-full border border-orange-500/30 bg-orange-500/10 px-4 py-2 text-sm font-medium text-orange-400"
+      >
+        <span className="relative flex h-2 w-2">
+          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-orange-400 opacity-75"></span>
+          <span className="relative inline-flex h-2 w-2 rounded-full bg-orange-500"></span>
+        </span>
+        Powered by Nakamoto & sBTC
+      </motion.div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+      {/* Main Title */}
+      <motion.h1
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.1 }}
+        className="max-w-4xl text-5xl font-black tracking-tight text-white sm:text-7xl mb-6"
+      >
+        Trustless B2B <br />
+        <span className="bg-gradient-to-r from-orange-400 via-amber-500 to-yellow-500 bg-clip-text text-transparent">
+          Bitcoin Escrow
+        </span>
+      </motion.h1>
 
-        {/* Feature 4: Live Mempool Fast-Path UI */}
-        <div className="bg-gray-900 border border-gray-800 p-6 rounded-xl shadow-lg">
-          <h2 className="text-xl font-semibold mb-4 text-gray-200">Transaction Finality (Nakamoto)</h2>
+      {/* Subtitle */}
+      <motion.p
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.2 }}
+        className="max-w-2xl text-lg text-gray-400 mb-10 leading-relaxed"
+      >
+        LexNakamoto provides milestone-based programmable escrows backed by Bitcoin finality. Securely lock funds, resolve disputes with arbiters, and trigger mutual refunds safely.
+      </motion.p>
 
-          <div className="space-y-4">
-            <div className={`p-4 rounded-lg flex items-center transition-all duration-500 ${finalityState === 'pending' ? 'bg-yellow-500/20 border border-yellow-500/50' : 'bg-green-500/20 border border-green-500/50'}`}>
-              <span className="text-2xl mr-4">{finalityState === 'pending' ? '⏳' : '⚡'}</span>
-              <div>
-                <p className="font-bold">{finalityState === 'pending' ? 'Mempool Pending...' : 'Fast-Path Secured (~5s)'}</p>
-                <p className="text-xs text-gray-400">Nakamoto block confirmation via Stacks API</p>
-              </div>
-            </div>
+      {/* Call to Actions */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.3 }}
+        className="flex flex-col sm:flex-row gap-4"
+      >
+        <Link
+          href="/dashboard"
+          className="px-8 py-4 bg-orange-600 hover:bg-orange-500 text-white rounded-xl font-bold shadow-lg shadow-orange-900/20 transition-all transform hover:-translate-y-1"
+        >
+          Launch dApp
+        </Link>
+        <a
+          href="https://github.com/Direwolfe999/LexNakamoto"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="px-8 py-4 bg-gray-800 border border-gray-700 hover:bg-gray-700 text-white rounded-xl font-bold transition-all transform hover:-translate-y-1 flex items-center justify-center gap-2"
+        >
+          View Documentation
+        </a>
+      </motion.div>
 
-            <div className={`p-4 rounded-lg flex items-center transition-all duration-500 ${finalityState === 'bitcoin-anchored-final' ? 'bg-orange-500/20 border border-orange-500/50' : 'bg-gray-800 border border-gray-700 opacity-50'}`}>
-              <span className="text-2xl mr-4">{finalityState === 'bitcoin-anchored-final' ? '🔒' : '⛓️'}</span>
-              <div>
-                <p className="font-bold">{finalityState === 'bitcoin-anchored-final' ? 'Bitcoin L1 Anchored' : 'Awaiting Bitcoin L1...'}</p>
-                <p className="text-xs text-gray-400">100% Finality Reached</p>
-              </div>
-            </div>
+      {/* Feature Grid */}
+      <motion.div
+        initial={{ opacity: 0, y: 40 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.7, delay: 0.5 }}
+        className="mt-24 grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl w-full text-left"
+      >
+        <div className="p-6 rounded-2xl bg-gray-900/50 border border-gray-800 backdrop-blur-sm">
+          <div className="w-12 h-12 rounded-lg bg-orange-500/20 text-orange-400 flex items-center justify-center text-2xl mb-4">
+            ⛓️
           </div>
+          <h3 className="text-xl font-bold text-white mb-2">Bitcoin Finality</h3>
+          <p className="text-gray-400 text-sm">Every escrow state change is irreversibly anchored to the Bitcoin L1 through the Stacks network.</p>
         </div>
 
-        {/* Feature 5: Fiat-to-sBTC Volatility Display */}
-        <div className="bg-gray-900 border border-gray-800 p-6 rounded-xl shadow-lg">
-          <h2 className="text-xl font-semibold mb-4 text-gray-200">Active Escrow Valuation</h2>
-
-          <div className="bg-black/50 p-6 rounded-lg text-center">
-            <div className="text-5xl font-mono font-bold text-orange-500 mb-2">
-              {escrowAmt} <span className="text-2xl text-orange-700">sBTC</span>
-            </div>
-
-            {/* Real-time USD mapping */}
-            <div className="text-2xl text-green-400 font-semibold mb-1">
-              ≈ ${(escrowAmt * (sbtcPrice || 0)).toLocaleString()} USD
-            </div>
-            <p className="text-xs text-gray-500">Live API Oracle Price: $ {(sbtcPrice || 0).toLocaleString()} / BTC</p>
+        <div className="p-6 rounded-2xl bg-gray-900/50 border border-gray-800 backdrop-blur-sm">
+          <div className="w-12 h-12 rounded-lg bg-blue-500/20 text-blue-400 flex items-center justify-center text-2xl mb-4">
+            ⚖️
           </div>
-
-          <div className="mt-6 flex gap-4">
-            <button className="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-lg transition-colors">Sign Mutual Refund</button>
-            <button className="flex-1 bg-gray-700 hover:bg-gray-600 text-white font-bold py-3 rounded-lg transition-colors">View Invoice Hash (IPFS)</button>
-          </div>
+          <h3 className="text-xl font-bold text-white mb-2">Dispute Resolution</h3>
+          <p className="text-gray-400 text-sm">Built-in arbiter functionality allows independent third parties to step in and divide funds fairly.</p>
         </div>
 
-      </div>
-    </main>
+        <div className="p-6 rounded-2xl bg-gray-900/50 border border-gray-800 backdrop-blur-sm">
+          <div className="w-12 h-12 rounded-lg bg-green-500/20 text-green-400 flex items-center justify-center text-2xl mb-4">
+            💸
+          </div>
+          <h3 className="text-xl font-bold text-white mb-2">Native sBTC</h3>
+          <p className="text-gray-400 text-sm">Transact entirely with natively mapped Bitcoin utilizing the secure sBTC standard directly in contracts.</p>
+        </div>
+      </motion.div>
+
+      {/* Footer */}
+      <motion.footer
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 1, delay: 0.8 }}
+        className="mt-20 border-t border-gray-800/60 w-full pt-8 pb-4 text-center mt-auto"
+      >
+        <p className="text-gray-500 text-sm">
+          © {new Date().getFullYear()} LexNakamoto Protocol. All rights reserved.
+        </p>
+        <div className="flex justify-center gap-4 mt-4 text-gray-400">
+          <Link href="/terms" className="hover:text-orange-400 transition-colors text-sm">Terms of Service</Link>
+          <Link href="/privacy" className="hover:text-orange-400 transition-colors text-sm">Privacy Policy</Link>
+          <a href="https://github.com/Direwolfe999/LexNakamoto" target="_blank" rel="noopener noreferrer" className="hover:text-orange-400 transition-colors text-sm">GitHub</a>
+        </div>
+      </motion.footer>
+    </div>
   );
 }

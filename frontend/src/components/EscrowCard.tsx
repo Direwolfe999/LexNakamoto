@@ -169,7 +169,7 @@ export default function EscrowCard({ escrow, onAction }: EscrowCardProps) {
     };
 
     return (
-        <GlassCard hover className="p-6">
+        <GlassCard data-tour="tour-escrow-card" hover className="p-6">
             {/* Header */}
             <div className="flex items-start justify-between">
                 <div>

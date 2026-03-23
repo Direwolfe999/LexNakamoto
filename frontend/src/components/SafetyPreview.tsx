@@ -153,6 +153,7 @@ export default function SafetyPreview({
                             </button>
                             <motion.button
                                 type="button"
+                                data-tour="tour-confirm-tx"
                                 onClick={onConfirm}
                                 disabled={loading}
                                 whileHover={{ scale: 1.02 }}

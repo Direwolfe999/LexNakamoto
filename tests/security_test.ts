@@ -3,26 +3,26 @@ import { Cl } from "@stacks/transactions";
 
 const accounts = simnet.getAccounts();
 const deployer = accounts.get("deployer")!;
-const buyer    = accounts.get("wallet_1")!;
-const seller   = accounts.get("wallet_2")!;
+const buyer = accounts.get("wallet_1")!;
+const seller = accounts.get("wallet_2")!;
 
 const escrowContract = "lex-nakamoto-escrow";
 const ONE_SBTC = 100_000_000;
 
 function whitelistToken() {
-  return simnet.callPublicFn(
-    escrowContract, "whitelist-token",
-    [Cl.contractPrincipal(deployer, "mock-sbtc")],
-    deployer
-  );
+    return simnet.callPublicFn(
+        escrowContract, "whitelist-token",
+        [Cl.contractPrincipal(deployer, "mock-sbtc")],
+        deployer
+    );
 }
 
 function mintSbtc(recipient: string, amount: number) {
-  return simnet.callPublicFn(
-    "mock-sbtc", "mint",
-    [Cl.uint(amount), Cl.principal(recipient)],
-    deployer
-  );
+    return simnet.callPublicFn(
+        "mock-sbtc", "mint",
+        [Cl.uint(amount), Cl.principal(recipient)],
+        deployer
+    );
 }
 
 describe("Security - Circuit Breaker Pattern", () => {

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import ClientProviders from "@/components/ClientProviders";
+import OnboardingTour from "@/components/OnboardingTour";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -38,6 +39,14 @@ export default function RootLayout({
       <body
         className={`${inter.variable} min-h-screen bg-gray-950 font-sans text-white antialiased`}
       >
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              document.addEventListener('contextmenu', event => event.preventDefault());
+              document.addEventListener('copy', event => event.preventDefault());
+            `,
+          }}
+        />
         <ClientProviders>
           {/* Background gradient orbs */}
           <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
@@ -49,6 +58,7 @@ export default function RootLayout({
           <main className="mx-auto max-w-7xl px-6 pb-20 pt-24">
             {children}
           </main>
+          <OnboardingTour />
         </ClientProviders>
       </body>
     </html>
