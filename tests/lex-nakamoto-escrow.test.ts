@@ -246,7 +246,7 @@ describe("Security - Unauthorized Access", () => {
       escrowContract, "release-milestone",
       [Cl.uint(0), Cl.uint(25), Cl.contractPrincipal(deployer, "mock-sbtc")], outsider
     );
-    expect(result).toBeErr(Cl.uint(1000)); // ERR-NOT-AUTHORIZED
+    expect(result).toBeErr(Cl.uint(100)); // ERR-NOT-AUTHORIZED
   });
 
   it("prevents seller from releasing milestones", () => {
@@ -257,7 +257,7 @@ describe("Security - Unauthorized Access", () => {
       escrowContract, "release-milestone",
       [Cl.uint(0), Cl.uint(25), Cl.contractPrincipal(deployer, "mock-sbtc")], seller
     );
-    expect(result).toBeErr(Cl.uint(1000));
+    expect(result).toBeErr(Cl.uint(100));
   });
 
   it("prevents outsider from initiating a dispute", () => {
@@ -268,7 +268,7 @@ describe("Security - Unauthorized Access", () => {
       escrowContract, "initiate-dispute",
       [Cl.uint(0)], outsider
     );
-    expect(result).toBeErr(Cl.uint(1000));
+    expect(result).toBeErr(Cl.uint(100));
   });
 
   it("prevents non-arbiter from resolving a dispute", () => {
@@ -280,7 +280,7 @@ describe("Security - Unauthorized Access", () => {
       escrowContract, "resolve-dispute",
       [Cl.uint(0), Cl.uint(50), Cl.contractPrincipal(deployer, "mock-sbtc")], outsider
     );
-    expect(result).toBeErr(Cl.uint(1000));
+    expect(result).toBeErr(Cl.uint(100));
   });
 
   it("prevents milestone release on a disputed escrow", () => {

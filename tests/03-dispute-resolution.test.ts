@@ -91,7 +91,7 @@ describe("Dispute Resolution", () => {
     createEscrow();
 
     const { result } = initiateDispute(0, outsider);
-    expect(result).toBeErr(Cl.uint(1000));
+    expect(result).toBeErr(Cl.uint(100));
   });
 
   it("arbiter resolves dispute: 100 % to seller", () => {
@@ -151,7 +151,7 @@ describe("Dispute Resolution", () => {
     initiateDispute(0, buyer);
 
     const { result } = resolveDispute(0, 50, outsider);
-    expect(result).toBeErr(Cl.uint(1000));
+    expect(result).toBeErr(Cl.uint(100));
   });
 
   it("cannot resolve a non-disputed escrow (ERR-NOT-IN-DISPUTE u1012)", () => {

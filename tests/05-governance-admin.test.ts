@@ -80,7 +80,7 @@ describe("Governance & Admin", () => {
       [Cl.principal(newArbiter)],
       outsider
     );
-    expect(result).toBeErr(Cl.uint(1000));
+    expect(result).toBeErr(Cl.uint(100));
   });
 
   it("wrong person cannot accept nomination (ERR-NOT-NOMINATED u1016)", () => {
@@ -126,7 +126,7 @@ describe("Governance & Admin", () => {
       escrowContract, "whitelist-token", [tokenArg()],
       outsider
     );
-    expect(result).toBeErr(Cl.uint(1000));
+    expect(result).toBeErr(Cl.uint(100));
   });
 
   it("get-escrow-status returns human-readable ASCII via int-to-ascii (v3)", () => {

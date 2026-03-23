@@ -217,6 +217,6 @@ describe("Time-Lock & Expiry", () => {
       [Cl.uint(0), tokenArg()],
       seller
     );
-    expect(result).toBeErr(Cl.uint(1000));
+    expect(result).toBeErr(Cl.uint(100));
   });
 });

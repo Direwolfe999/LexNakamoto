@@ -142,9 +142,9 @@ describe("Milestone Release", () => {
     createEscrow();
 
     const { result: r1 } = releaseMilestone(0, 25, seller);
-    expect(r1).toBeErr(Cl.uint(1000));
+    expect(r1).toBeErr(Cl.uint(100));
 
     const { result: r2 } = releaseMilestone(0, 25, outsider);
-    expect(r2).toBeErr(Cl.uint(1000));
+    expect(r2).toBeErr(Cl.uint(100));
   });
 });
