@@ -32,7 +32,8 @@
 ;; 2. CONSTANTS -- Error Codes
 ;; ---------------------------------------------------------------------------
 
-(define-constant ERR-NOT-AUTHORIZED (err u1000))
+(define-constant ERR-NOT-AUTHORIZED (err u100))
+(define-constant ERR-CONTRACT-PAUSED (err u101))
 (define-constant ERR-ESCROW-NOT-FOUND (err u1001))
 (define-constant ERR-ESCROW-ALREADY-EXISTS (err u1002))
 (define-constant ERR-INVALID-AMOUNT (err u1003))
@@ -85,6 +86,9 @@
 ;; ---------------------------------------------------------------------------
 ;; 5. DATA VARIABLES
 ;; ---------------------------------------------------------------------------
+(define-constant contract-owner tx-sender)
+(define-data-var is-paused bool false)
+
 (define-data-var escrow-id-nonce uint u0)
 (define-data-var platform-arbiter principal tx-sender)
 
@@ -313,6 +317,7 @@
       (token-principal (contract-of token))
     )
     ;; -- Guards ----------------------------------------------------------
+    (asserts! (not (var-get is-paused)) ERR-CONTRACT-PAUSED)
     (asserts! (> amount u0) ERR-INVALID-AMOUNT)
     (asserts! (not (is-eq buyer seller)) ERR-SELF-ESCROW)
     ;; contract-of verification: only whitelisted tokens accepted.
@@ -373,6 +378,7 @@
       (state (get state escrow))
       (target-released (calculate-milestone-amount total milestone-pct))
     )
+    (asserts! (not (var-get is-paused)) ERR-CONTRACT-PAUSED)
     (asserts! (is-eq tx-sender buyer) ERR-NOT-AUTHORIZED)
     (asserts! (is-eq state STATE-ACTIVE) ERR-ESCROW-NOT-ACTIVE)
     ;; Prevent releases on disputed or already-completed escrows.
@@ -591,6 +597,13 @@
 ;; ---------------------------------------------------------------------------
 ;; 10. ADMIN FUNCTIONS
 ;; ---------------------------------------------------------------------------
+
+(define-public (emergency-toggle (state bool))
+  (begin
+    (asserts! (is-eq tx-sender contract-owner) ERR-NOT-AUTHORIZED)
+    (ok (var-set is-paused state))
+  )
+)
 
 ;; -- 10a. TWO-STEP ARBITER GOVERNANCE ----------------------------------------
 (define-public (nominate-arbiter (new-arbiter principal))
