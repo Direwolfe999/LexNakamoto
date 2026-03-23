@@ -1,0 +1,39 @@
+name: LexNakamoto CI/CD
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  validate-and-test:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Setup Clarinet
+        uses: hirosystems/clarinet-action@v1.0.0
+
+      - name: Validate Smart Contracts
+        run: clarinet check
+
+      - name: Run Test Suite
+        run: npm run test
+
+      - name: Run Frontend Linter
+        run: npm run lint
+        working-directory: ./frontend

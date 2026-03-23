@@ -1,64 +1,115 @@
-# 🏛️ LexNakamoto: Milestone-Based sBTC Escrow
+# LexNakamoto
 
-**LexNakamoto** is a professional-grade, trustless escrow protocol designed for the Stacks Nakamoto era. It enables secure, decentralized service agreements using **sBTC**, allowing for milestone-based payments and robust dispute resolution.
+LexNakamoto is a milestone-based sBTC escrow project for Stacks. Buyers lock a whitelisted SIP-010 token into a Clarity contract, release 25%, 50%, or 100% milestones, raise disputes, reclaim expired escrows, and monitor settlement progress from a Next.js dashboard.
 
----
+## Repo Layout
 
-## 🚀 Overview
-In a decentralized economy, trust is the biggest barrier to trade. **LexNakamoto** removes the need for "blind trust" between freelancers and clients. 
+- `contracts/`
+  - `lex-nakamoto-escrow.clar`: core escrow contract
+  - `mock-sbtc.clar`: mock SIP-010 token for simnet and local demo flows
+  - `sip-010-ft-standard.clar`: trait definition
+- `tests/`
+  - focused Clarinet/Vitest suites for creation, milestones, disputes, time-locks, governance, and regression coverage
+- `frontend/`
+  - Next.js dashboard, wallet integration, settlement tracker, and sponsored-transaction helpers
+- `backend/`
+  - optional Express service for sponsorship, transaction-status polling, and lightweight dispute records
 
-By utilizing **Clarity 3**, this smart contract ensures that sBTC is only released when specific project milestones are met, or returned if the terms of the contract are violated.
+## Verified Status
 
-### Key Features
-* **sBTC Native:** Built specifically for the SIP-010 sBTC token standard.
-* **Milestone Payments:** Release funds in 25%, 50%, or 100% increments as work is completed.
-* **Nakamoto-Ready:** Optimized for the fast-block finality of the Stacks 2024-2026 upgrades.
-* **Dispute Layer:** Integrated logic for a third-party arbiter (DAO or Admin) to resolve conflicts.
-* **Post-Condition Security:** Fully compatible with Stacks.js post-conditions to prevent unauthorized asset transfers.
+This branch has been checked locally with:
 
----
-
-## 🛠️ Technical Architecture
-
-### Smart Contract Logic (`contracts/lex-nakamoto-escrow.clar`)
-The contract manages the state of every escrow agreement via a `Data Map`. 
-- **Status 0:** Pending (Funds locked)
-- **Status 1:** In-Progress (Partial milestones released)
-- **Status 2:** Completed (All funds released)
-- **Status 3:** Disputed (Funds frozen for arbitration)
-
-### Built With
-* **Language:** Clarity 3.0
-* **Framework:** Clarinet
-* **Standard:** SIP-010 (sBTC)
-* **Testing:** Vitest (Stacks/Clarinet SDK)
-
----
-
-## 📋 How It Works
-
-1.  **Initiate:** The Buyer calls `create-escrow`, locking the total sBTC amount into the LexNakamoto contract.
-2.  **Milestones:** As the Seller completes tasks, the Buyer calls `release-milestone`. The contract calculates the percentage and transfers that portion of sBTC immediately.
-3.  **Completion:** Once 100% of milestones are reached, the escrow is marked as `Completed`.
-4.  **Dispute:** If a conflict arises, either party can trigger `initiate-dispute`, which freezes the remaining balance until the `arbiter` address provides a resolution.
-
----
-
-## 💻 Installation & Testing
-
-### Prerequisites
-* [Clarinet](https://github.com/hirosystems/clarinet) installed.
-* A Stacks wallet (Leather, Xverse, or OKX).
-
-### Setup
 ```bash
-# Clone the repository
-git clone https://github.com/Direwolfe999/LexNakamoto.git
-# Navigate to the folder
-cd lex-nakamoto
-
-# Check the contract
 clarinet check
+npm test
+cd frontend && npm run build
+cd ../backend && npm run build
+```
 
-# Run the unit tests
-clarinet test# LexNakamoto
+Current results:
+
+- `clarinet check`: passes for 3 contracts
+- `npm test`: 59/59 tests passing across 6 test files
+- `frontend`: production build passes
+- `backend`: TypeScript build passes
+
+## What The Contract Actually Does Today
+
+- Creates escrow agreements between buyer and seller with a whitelisted SIP-010 token
+- Releases 25%, 50%, or 100% milestones from the buyer to the seller
+- Lets buyer or seller open disputes
+- Lets the configured arbiter split remaining funds during dispute resolution
+- Lets the buyer reclaim funds after the escrow expiry height
+- Lets the buyer claw back overdue escrows after the 30-day threshold used by the app
+- Exposes human-readable status strings through `get-escrow-status`
+- Exposes height-based age and confirmation helpers that the UI can surface as progress indicators
+
+## Honest Constraints
+
+- `mock-sbtc.clar` is a demo/test token. It is not the mainnet sBTC contract.
+- The escrow contract currently stores creation-height snapshots for the age/finality-style helpers. The repo should not claim that it persists true `tenure-height` or `burn-block-height` values on-chain yet.
+- The backend keeps watched transactions, dispute records, and some rate-limit data in memory. That is fine for a demo backend, but it is not durable production storage.
+- `frontend/src/pages/api/deploy.ts` is a local developer helper only. It is disabled by default and should not be relied on in hosted environments.
+
+## Quick Start
+
+### Contract and tests
+
+```bash
+cd lex-nakamoto
+npm install
+clarinet check
+npm test
+```
+
+### Frontend
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Required frontend env values live in `frontend/.env.example`.
+
+### Backend
+
+```bash
+cd backend
+npm install
+npm run dev
+```
+
+If you do not need sponsorship or backend-driven status/dispute routes, the frontend can still run without the optional backend.
+
+## Deployment
+
+### Smart contract
+
+Deploy with Clarinet CLI or CI. After deployment, point the frontend at the deployed contract address and token contract.
+
+### Frontend
+
+Vercel is a good fit for the Next.js app.
+
+Recommended Vercel setup:
+
+- set `NEXT_PUBLIC_NETWORK`
+- set `NEXT_PUBLIC_STACKS_API_URL`
+- set `NEXT_PUBLIC_ESCROW_CONTRACT_ADDRESS`
+- set `NEXT_PUBLIC_ESCROW_CONTRACT_NAME`
+- keep `NEXT_PUBLIC_ENABLE_LOCAL_DEPLOY_API=false`
+- keep `ENABLE_LOCAL_CLARINET_DEPLOY=false`
+
+### Backend
+
+Use Render, Railway, or Fly.io for the Express backend if you want sponsorship, status polling, or dispute APIs. It is not a great first fit for Vercel because it depends on a private sponsor key and currently keeps some state in memory.
+
+## Submission Notes
+
+For Code for STX, this repo is strongest when described as:
+
+- a working Clarity escrow app with milestone releases and dispute handling
+- a buildable frontend that surfaces escrow and settlement state clearly
+- a demo backend for sponsorship/status workflows
+- an honest in-progress product, not a finished mainnet custody system
