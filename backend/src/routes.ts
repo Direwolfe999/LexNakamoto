@@ -5,8 +5,14 @@ import { IndexerService } from "./services/IndexerService.js";
 import { NotificationService } from "./services/NotificationService.js";
 import { SponsorService } from "./services/SponsorService.js";
 import { sponsorRateLimiter } from "./middleware/rateLimiter.js";
+import { healthRouter } from "./routes/health.js";
+import { metricsRouter } from "./routes/metrics.js";
+import { metricsStore } from "./utils/metricsStore.js";
 
 const router = Router();
+router.use(healthRouter);
+router.use(metricsRouter);
+
 const sponsorService = new SponsorService();
 const finalityMonitor = new FinalityMonitor();
 const indexerService = new IndexerService(finalityMonitor);
@@ -30,6 +36,8 @@ router.post("/api/sponsor", sponsorRateLimiter, async (req: Request, res: Respon
       principal,
       ip: req.ip ?? "unknown",
     });
+
+    metricsStore.incrementSponsoredTx();
 
     await notificationService.dispatch("escrow.sponsored", {
       txid: out.txid,
